@@ -23,7 +23,7 @@ public final class Lambert implements EventListener
     {
         if (event instanceof ReadyEvent)
         {
-            System.out.println("Bot is ready...");
+            System.out.println("Bot is ready!");
         }
         else if (event instanceof MessageReceivedEvent)
         {

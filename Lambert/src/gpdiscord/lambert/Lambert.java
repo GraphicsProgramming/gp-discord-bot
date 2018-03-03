@@ -3,6 +3,7 @@ package gpdiscord.lambert;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
@@ -18,6 +19,8 @@ import net.dv8tion.jda.core.hooks.EventListener;
 
 public final class Lambert implements EventListener
 {
+	private HashMap<Long, Integer> scores = new HashMap<Long, Integer>();
+	
 	@Override
     public void onEvent(Event event)
     {
@@ -28,12 +31,19 @@ public final class Lambert implements EventListener
         else if (event instanceof MessageReceivedEvent)
         {
         	MessageReceivedEvent msg = (MessageReceivedEvent) event;
-        	if (msg.getMessage().getContentDisplay().contains("thanks") || msg.getMessage().getContentDisplay().contains("thx") || msg.getMessage().getContentDisplay().contains("thank you"))
+        	
+        	if (msg.getMessage().getContentDisplay().startsWith("!level"))
+        	{
+        		int score = scores.getOrDefault(msg.getAuthor().getIdLong(), 0);
+        		msg.getChannel().sendMessage(msg.getAuthor().getAsMention() + " you have " + score + " pixels!\nProgress to next level: " + score + "/2").complete();
+        	}
+        	else if (msg.getMessage().getContentDisplay().contains("thanks") || msg.getMessage().getContentDisplay().contains("thx") || msg.getMessage().getContentDisplay().contains("thank you"))
         	{
         		List<Member> thanked = msg.getMessage().getMentionedMembers();
         		for (Member member : thanked)
         		{
-        			msg.getChannel().sendMessage(member.getUser().getName() + " was thanked by " + msg.getAuthor().getName()).complete();
+        			msg.getChannel().sendMessage(member.getUser().getAsMention() + " your helpfulness has earned you 1 pixels!").complete();
+        			scores.put(member.getUser().getIdLong(), scores.getOrDefault(member.getUser().getIdLong(), 0) + 1);
         		}
         	}
         }
